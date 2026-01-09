@@ -3,5 +3,4 @@ pandas
 plotly
 openpyxl
 Pillow
-streamlit-authenticator
-
+streamlit-authenticator==0.3.2
