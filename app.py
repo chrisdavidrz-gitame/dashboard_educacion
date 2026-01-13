@@ -35,7 +35,16 @@ elif st.session_state["authentication_status"] is None:
 elif st.session_state["authentication_status"]:
     
     # --- INTERFAZ DEL DASHBOARD ---
-    authenticator.logout('Cerrar Sesión', 'sidebar')
+
+    # --- HEADER SUPERIOR ---
+    top_c1, top_c2, top_c3 = st.columns([8, 1, 2])
+
+
+    with top_c3:
+        st.markdown('<div class="logout-wrap">', unsafe_allow_html=True)
+        authenticator.logout("Cerrar sesión")
+        st.markdown('</div>', unsafe_allow_html=True)
+
     
     # Estilo CSS
     st.markdown("""
@@ -51,6 +60,63 @@ elif st.session_state["authentication_status"]:
         div.stButton > button:hover { background-color: #3d3dcf; border-color: #ffffff; transform: scale(1.02); }
         [data-testid="stMetricValue"] { color: #00ffcc; font-size: 40px; }
         h1, h2, h3, p { color: white !important; }
+                
+                /* Sidebar completa */
+        section[data-testid="stSidebar"] {
+            background-color: #232D4F;
+        }
+
+        /* Contenido interno de la sidebar */
+        section[data-testid="stSidebar"] > div {
+            background-color: #232D4F;
+            color: white;
+        }
+
+                /* Botón logout superior derecho */
+        button[kind="secondary"] {
+            background-color: transparent;
+            color: #ffffff;
+
+            border-radius: 22px;
+            border: 1px solid #5f7db0;
+
+            /* 🔹 FORZAR HORIZONTAL */
+            height: auto;
+            min-height: unset;
+            min-width: 190px;
+            padding: 0.3em 2.6em;
+
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.6px;
+
+            white-space: nowrap;       /* 👈 una sola línea */
+            text-align: center;
+        }
+
+        /* Hover suave */
+        button[kind="secondary"]:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: #ffffff;
+        }
+
+        .logout-wrap button {
+            background-color: transparent !important;
+            border: 1px solid #5f7db0 !important;
+            border-radius: 22px !important;
+
+            min-width: 190px !important;     /* más largo */
+            width: 190px !important;         /* fija el ancho para que no parta */
+            padding: 0.3em 1.6em !important;
+
+            font-size: 12px !important;
+            font-weight: 500 !important;
+        }
+
+        /* el texto del botón, una sola línea */
+        .logout-wrap button * {
+            white-space: nowrap !important;
+
         </style>
     """, unsafe_allow_html=True)
 
@@ -60,6 +126,8 @@ elif st.session_state["authentication_status"]:
             f"<script>window.parent.document.getElementById('resultados').scrollIntoView({{behavior: 'smooth'}});</script>",
             height=0,
         )
+
+    
 
     # Encabezado con Logo
     col_log1, col_log2, col_log3 = st.columns([1, 2, 1])
