@@ -1,14 +1,16 @@
+# --- IMPORTACIONES ---
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from PIL import Image
 import streamlit.components.v1 as components
 import streamlit_authenticator as stauth
+import base64
 
-# 1. CONFIGURACIÓN DE LA PÁGINA
+# --- CONFIGURACIÓN DE LA PÁGINA ---
 st.set_page_config(page_title="Secretaría de Educación - Capital Humano", layout="wide")
 
-# --- 2. CONFIGURACIÓN DE SEGURIDAD ---
+# --- CONFIGURACIÓN DE SEGURIDAD Y AUTENTICACIÓN ---
 credenciales = {
     "usernames": {
         "admin": {
@@ -25,101 +27,199 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=30
 )
 
-# Renderizar Login
+# Renderizar formulario de login
 authenticator.login(location='main')
 
+# Verificar estado de autenticación
 if st.session_state["authentication_status"] is False:
     st.error('Usuario o contraseña incorrectos')
 elif st.session_state["authentication_status"] is None:
     st.warning('Por favor, ingrese sus credenciales para acceder.')
 elif st.session_state["authentication_status"]:
     
-    # --- INTERFAZ DEL DASHBOARD ---
+    # Cargar SVG para ícono de Progresar
+    try:
+        with open("logos/escuela.png", "rb") as f:
+            png_data = base64.b64encode(f.read()).decode()
+        svg_uri = f"data:image/png;base64,{png_data}"
+        
+        st.write("PNG cargado:", len(svg_uri))
+    except Exception as e:
+        st.error(f"Error cargando SVG: {e}")
+        svg_uri = ""
+    
+        css_extra = ""
+    if svg_uri:
+        css_extra = f"""\
+        /* Botón Progresar: layout horizontal (icono izq + texto der) */
 
-    # --- HEADER SUPERIOR ---
-    top_c1, top_c2, top_c3 = st.columns([8, 1, 2])
+        button.btn-progresar-icon {{
+            position: relative !important;
+
+            /* menos espacio a la izquierda */
+            padding-left: 10px !important;
+            padding-top: 12px !important;
+            padding-bottom: 18px !important;
+
+            text-align: left !important;
+            white-space: nowrap !important;
+            line-height: 1 !important;
+        }}
+
+        button.btn-progresar-icon::before {{
+            content: "" !important;
+            position: absolute !important;
+
+            /* icono más cerca del texto */
+            left: 24px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+
+            width: 52px !important;
+            height: 52px !important;
+
+            background-image: url("{svg_uri}") !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            background-size: contain !important;
+
+            display: block !important;
+        }}
+        """
+    # --- INTERFAZ PRINCIPAL DEL DASHBOARD (solo para usuarios autenticados) ---
+
+    # --- HEADER SUPERIOR CON BOTÓN DE LOGOUT ---
+    top_c1, top_c2, top_c3 = st.columns([7, 1, 1])
 
 
     with top_c3:
         st.markdown('<div class="logout-wrap">', unsafe_allow_html=True)
         authenticator.logout("Cerrar sesión")
         st.markdown('</div>', unsafe_allow_html=True)
+        # Añadir clase específica al botón generado por streamlit-authenticator
+        # --- SCRIPTS JAVASCRIPT PARA PERSONALIZACIÓN DE ELEMENTOS ---
+        # Script para añadir clase al botón de logout
+        components.html("""
+            <script>
+            try {
+                const btn = window.parent.document.querySelector('.logout-wrap button');
+                if (btn) {
+                    btn.classList.add('btn-logout');
+                    btn.setAttribute('data-role','logout');
+                }
+            } catch(e) { /* silent */ }
+            </script>
+        """, height=0)
+        
+        # Script para forzar color de las 'chips' del multiselect (aplica y observa cambios dinámicos)
+        components.html("""
+            <script>
+            (function(){
+                function applyChips(){
+                    try{
+                        const parentDoc = window.parent.document;
+                        // Selectores actualizados basados en la estructura HTML real
+                        const chipSelectors = [
+                            'span[data-baseweb="tag"]'
+                        ];
+                        chipSelectors.forEach(s=>{
+                            parentDoc.querySelectorAll(s).forEach(n=>{
+                                try{
+                                    n.style.backgroundColor = '#3E5A7E';
+                                    n.style.color = '#ffffff';
+                                    n.style.borderColor = 'rgba(0,0,0,0.08)';
+                                    
+                                } catch(e){}
+                            });
+                        });
+                        // Íconos de cierre (svg dentro de los chips)
+                        parentDoc.querySelectorAll('span[data-baseweb="tag"] svg').forEach(svg=>{
+                            try{
+                                svg.style.color = '#000000';
+                                svg.style.fill = '#000000';
+                            } catch(e){}
+                        });
+                    } catch(e){}
+                }
+                applyChips();
+                const parentDoc = window.parent.document;
+                const mo = new MutationObserver(()=>{ applyChips(); });
+                mo.observe(parentDoc.body, { childList: true, subtree: true });
+                // Reintentar por si tarda en renderizar
+                setInterval(applyChips, 1000);
+            })();
+            </script>
+        """, height=0)
+
+    # --- ESTILOS CSS PERSONALIZADOS ---
+
+    # ------------------------------------------------
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Montserrat:wght@300;400;500;700&display=swap');
+    html { scroll-behavior: smooth; }
+    html, body, .stApp {
+        font-family: 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+        font-size: 14px;
+    }
+    h1, h2, h3 { font-family: 'Lora', serif !important; }
+    .stApp { background-color: #232D4F; color: white; }
+
+    div.stButton > button {
+        background-color: #3E5A7E;
+        color: white;
+        border-radius: 15px;
+        height: 140px;
+        font-size: 24px !important;
+        font-weight: bold;
+        border: 2px solid #E7BA61;
+        transition: all 0.3s ease;
+        margin-bottom: 10px;
+        white-space: pre-wrap;
+    }
+
+    div.stButton > button:hover {
+        background-color: #5A7290;
+        border-color: #ffffff;
+        transform: scale(1.02);
+    }
+
+    button[kind="secondary"] {
+        background-color: transparent;
+        color: #ffffff;
+        border-radius: 22px;
+        border: 1px solid #5f7db0;
+        min-width: 190px;
+        padding: 1em 2.6em;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    button[kind="secondary"]:hover {
+        background-color: rgba(90, 114, 144);
+        border-color: #ffffff;
+    }
+
+    .btn-logout {
+        background-color: transparent !important;
+        border-radius: 16px !important;
+        height: 28px !important;
+        font-size: 11px !important;
+        opacity: 0.9;
+    }
 
     
-    # Estilo CSS
-    st.markdown("""
-        <style>
-        html { scroll-behavior: smooth; }
-        .stApp { background-color: #232D4F; color: white; }
-        div.stButton > button {
-            background-color: #45658D; color: white; border-radius: 15px;
-            height: 140px; font-size: 24px !important; font-weight: bold;
-            border: 2px solid #3d3dcf; transition: all 0.3s ease;
-            margin-bottom: 10px; white-space: pre-wrap;
-        }
-        div.stButton > button:hover { background-color: #3d3dcf; border-color: #ffffff; transform: scale(1.02); }
-        [data-testid="stMetricValue"] { color: #00ffcc; font-size: 40px; }
-        h1, h2, h3, p { color: white !important; }
-                
-                /* Sidebar completa */
-        section[data-testid="stSidebar"] {
-            background-color: #232D4F;
-        }
+    </style>
+""", unsafe_allow_html=True)
+    
+    if css_extra:
+        st.markdown(f"<style>{css_extra}</style>", unsafe_allow_html=True)
 
-        /* Contenido interno de la sidebar */
-        section[data-testid="stSidebar"] > div {
-            background-color: #232D4F;
-            color: white;
-        }
 
-                /* Botón logout superior derecho */
-        button[kind="secondary"] {
-            background-color: transparent;
-            color: #ffffff;
+    
+        #-------------------------------------------------------------------------------
 
-            border-radius: 22px;
-            border: 1px solid #5f7db0;
-
-            /* 🔹 FORZAR HORIZONTAL */
-            height: auto;
-            min-height: unset;
-            min-width: 190px;
-            padding: 0.3em 2.6em;
-
-            font-size: 12px;
-            font-weight: 500;
-            letter-spacing: 0.6px;
-
-            white-space: nowrap;       /* 👈 una sola línea */
-            text-align: center;
-        }
-
-        /* Hover suave */
-        button[kind="secondary"]:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-            border-color: #ffffff;
-        }
-
-        .logout-wrap button {
-            background-color: transparent !important;
-            border: 1px solid #5f7db0 !important;
-            border-radius: 22px !important;
-
-            min-width: 190px !important;     /* más largo */
-            width: 190px !important;         /* fija el ancho para que no parta */
-            padding: 0.3em 1.6em !important;
-
-            font-size: 12px !important;
-            font-weight: 500 !important;
-        }
-
-        /* el texto del botón, una sola línea */
-        .logout-wrap button * {
-            white-space: nowrap !important;
-
-        </style>
-    """, unsafe_allow_html=True)
-
+    # --- FUNCIÓN PARA CAMBIAR DE PROGRAMA SELECCIONADO ---
     def seleccionar_programa(nombre):
         st.session_state.programa_seleccionado = nombre
         components.html(
@@ -127,9 +227,7 @@ elif st.session_state["authentication_status"]:
             height=0,
         )
 
-    
-
-    # Encabezado con Logo
+    # --- ENCABEZADO CON LOGO Y TÍTULO ---
     col_log1, col_log2, col_log3 = st.columns([1, 2, 1])
     with col_log2: 
         try:
@@ -140,13 +238,14 @@ elif st.session_state["authentication_status"]:
     st.markdown("<h1 style='text-align: center;'>Dirección Nacional de Políticas de Fortalecimiento Educativo</h1>", unsafe_allow_html=True)
     st.divider()
 
-    # Botones de Navegación
+    # --- BOTONES DE NAVEGACIÓN ENTRE PROGRAMAS ---
     if "programa_seleccionado" not in st.session_state:
         st.session_state.programa_seleccionado = "General"
 
     f1_c1, f1_c2, f1_c3, f1_c4 = st.columns(4)
     with f1_c1:
-        if st.button("🎓\nProgresar", use_container_width=True): seleccionar_programa("Progresar")
+        if st.button("Progresar", key="btn_progresar", use_container_width=True):
+            seleccionar_programa("Progresar")
     with f1_c2:
         if st.button("🎫\nVouchers\nEducativos", use_container_width=True): seleccionar_programa("Vouchers")
     with f1_c3:
@@ -157,14 +256,38 @@ elif st.session_state["authentication_status"]:
     f2_c1, f2_c2, f2_c3, f2_c4 = st.columns(4)
     with f2_c1:
         if st.button("📖\nLibros para\naprender", use_container_width=True): seleccionar_programa("Libros")
+    components.html("""
+<script>
+(function(){
+  function tagProgresar(){
+    try{
+      const doc = window.parent.document;
+
+      // Encuentra todos los botones y busca el que tenga el texto "Progresar"
+      const btns = Array.from(doc.querySelectorAll('button'));
+      const b = btns.find(x => (x.innerText || "").trim() === "Progresar");
+
+      if(b){
+        b.classList.add("btn-progresar-icon");
+      }
+    } catch(e){}
+  }
+
+  tagProgresar();
+  const mo = new MutationObserver(tagProgresar);
+  mo.observe(window.parent.document.body, {childList:true, subtree:true});
+})();
+</script>
+""", height=0)
+
 
     st.divider()
     st.markdown("<div id='resultados'></div>", unsafe_allow_html=True)
     st.subheader(f"Visualizando: {st.session_state.programa_seleccionado}")
 
-    # --- LÓGICA DE VISUALIZACIÓN ---
+    # --- LÓGICA DE VISUALIZACIÓN POR PROGRAMA ---
 
-    # 1. COMEDORES
+    # --- VISUALIZACIÓN PARA COMEDORES ESCOLARES ---
     if st.session_state.programa_seleccionado == "Comedores":
         try:
             df_comedores = pd.read_excel("Resumen_rondos_comedores.xlsx")
@@ -183,7 +306,7 @@ elif st.session_state["authentication_status"]:
             st.dataframe(df_filtrado[['Jurisdicción', 'Organismo provincial responsable', 'Monto Anual', 'Ejecución Presupuestaria %']], use_container_width=True)
         except Exception as e: st.error(f"Error en Comedores: {e}")
 
-    # 2. VOUCHERS
+    # --- VISUALIZACIÓN PARA VOUCHERS EDUCATIVOS ---
     elif st.session_state.programa_seleccionado == "Vouchers":
         try:
             df_vouchers = pd.read_excel("20251215_VOUCHERS.xlsx", header=1)
@@ -206,7 +329,7 @@ elif st.session_state["authentication_status"]:
                 st.plotly_chart(px.bar(df_bar, x='Jurisdicción', y='Alumnos', color='Alumnos', color_continuous_scale='Blues', title="Alumnos por Jurisdicción"), use_container_width=True)
         except Exception as e: st.error(f"Error en Vouchers: {e}")
 
-    # 3. BECAS
+    # --- VISUALIZACIÓN PARA BECAS DE FORTALECIMIENTO ---
     elif st.session_state.programa_seleccionado == "Becas":
         try:
             df_becas = pd.read_excel("Becas_Fortaleciemiento.xlsx")
@@ -229,7 +352,7 @@ elif st.session_state["authentication_status"]:
                 st.plotly_chart(px.bar(df_becas, x='Jurisdicción', y=validas[sel], color=validas[sel], color_continuous_scale='Viridis'), use_container_width=True)
         except Exception as e: st.error(f"Error en Becas: {e}")
 
-    # 4. LIBROS
+    # --- VISUALIZACIÓN PARA LIBROS PARA APRENDER ---
     elif st.session_state.programa_seleccionado == "Libros":
         try:
             df_libros = pd.read_excel("Libros_Anexo_III.xlsx")
@@ -249,7 +372,7 @@ elif st.session_state["authentication_status"]:
                 st.plotly_chart(px.bar(df_area, x='Grado', y='Cantidad', color='Área', barmode='group', title="Libros por Área y Grado"), use_container_width=True)
         except Exception as e: st.error(f"Error en Libros: {e}")
 
-    # 5. PROGRESAR
+    # --- VISUALIZACIÓN PARA PROGRAMA PROGRESAR ---
     elif st.session_state.programa_seleccionado == "Progresar":
         try:
             # Leemos Progresar.xlsx saltando la primera fila de cabecera combinada
@@ -262,7 +385,7 @@ elif st.session_state["authentication_status"]:
             for col in df_prov.columns[1:]:
                 df_prov[col] = pd.to_numeric(df_prov[col], errors='coerce').fillna(0)
 
-            st.info("Visualizando: Programa Progresar 2024")
+            st.info("Visualizando: Programa Progresar 2025")
             
             # Métricas
             total_adj = df_total[['Obligatorio_Adj', 'Superior_Adj', 'Trabajo_Adj']].astype(float).sum()
@@ -285,6 +408,6 @@ elif st.session_state["authentication_status"]:
                 st.dataframe(df_prov, use_container_width=True)
         except Exception as e: st.error(f"Error en Progresar: {e}")
 
-    # Pie de página
+    # --- PIE DE PÁGINA ---
     st.markdown("---")
     st.markdown("<p style='text-align: center; opacity: 0.5;'>Sistema de Monitoreo Educativo 2026 - Acceso Restringido</p>", unsafe_allow_html=True)
