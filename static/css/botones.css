@@ -1,0 +1,82 @@
+/* ==================================================
+   BOTONES DEL MENÚ (NO PROGRESAR) + ICONOS PNG
+   ================================================== */
+
+/* Base */
+button.btn-menu-icon {
+  position: relative !important;
+  height: 140px !important;
+  text-align: left !important;
+
+  /* espacio para icono + balance óptico */
+  padding-left: 88px !important;
+  padding-right: 96px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+}
+
+/* Icono */
+button.btn-menu-icon::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 20px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+
+  /* El PNG sea 150x150 no importa: se escala acá */
+  width: 56px !important;
+  height: 56px !important;
+
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+  display: block !important;
+}
+
+/* Texto real renderizado por Streamlit */
+button.btn-menu-icon div[data-testid="stMarkdownContainer"] {
+  display: flex !important;
+  align-items: center !important;
+}
+
+button.btn-menu-icon div[data-testid="stMarkdownContainer"] p {
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  line-height: 1.1 !important;
+  margin: 0 !important;
+  position: relative;
+  top: 2px;
+}
+
+/* Fallback */
+button.btn-menu-icon p {
+  font-size: 30px !important;
+  font-weight: 600 !important;
+}
+
+/* ==================================================
+   ICONOS POR BOTÓN (logos/*.png)
+   ================================================== */
+
+/* Vouchers */
+button.btn-menu-vouchers::before {
+  background-image: url("/app/static/logos/vouchers.png") !important;
+}
+
+/* Becas */
+button.btn-menu-becas::before {
+  background-image: url("/app/static/logos/becas.png") !important;
+}
+
+/* Comedores */
+button.btn-menu-comedores::before {
+  background-image: url("/app/static/logos/comida.png") !important;
+}
+
+/* Libros */
+button.btn-menu-libros::before {
+  background-image: url("/app/static/logos/libros.png") !important;
+}
+

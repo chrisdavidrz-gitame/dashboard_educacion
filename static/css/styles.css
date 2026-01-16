@@ -44,11 +44,21 @@ button[kind="secondary"]:hover {
 
 .btn-logout {
     background-color: transparent !important;
-    border-radius: 16px !important;
-    height: 28px !important;
+    border-radius: 14px !important;
+
+    /* ↓ más bajito */
+    height: 22px !important;
+    min-height: unset !important;
+
+    /* ajusta el “aire” interno */
+    padding: 0 12px !important;
+
     font-size: 11px !important;
-    opacity: 1;
+    line-height: 1 !important;
+
+    opacity: 0.9;
 }
+
 
 /* Fuerza el fondo aunque Streamlit cambie wrappers */
 .stApp, [data-testid="stAppViewContainer"] {
@@ -156,4 +166,76 @@ div[data-testid="stMetricLabel"] {
 
 div[data-testid="stMetricDelta"] {
   color: #7FB3FF !important;
+}
+
+
+/* ============================
+   SELECTBOX / DROPDOWN (BaseWeb)
+   ============================ */
+
+/* Texto seleccionado (cerrado) */
+div[data-baseweb="select"] > div {
+  color: #ffffff !important;
+}
+
+/* Placeholder / valor activo */
+div[data-baseweb="select"] span {
+  color: #ffffff !important;
+}
+
+/* Caja del select */
+div[data-baseweb="select"] > div {
+  background-color: #2E3F5F !important; /* azul más claro que el fondo */
+  border-color: #5A7290 !important;
+}
+
+/* Opciones dentro del dropdown */
+div[data-baseweb="menu"] {
+  background-color: #ffffff !important;
+}
+
+/* Texto de las opciones */
+div[data-baseweb="menu"] span {
+  color: #1a1a1a !important;
+}
+
+/* Hover de opción */
+div[data-baseweb="menu"] li:hover {
+  background-color: #E8EEF6 !important;
+}
+
+/* ============================
+   LOGOUT (target robusto)
+   ============================ */
+
+/* el botón real que marca el JS */
+button[data-role="logout"] {
+  background-color: transparent !important;
+  border-radius: 14px !important;
+
+  /* más bajito */
+  height: 22px !important;
+  min-height: unset !important;
+
+  /* aire interno */
+  padding: 0 12px !important;
+
+  font-size: 11px !important;
+  line-height: 1 !important;
+
+  opacity: 0.9 !important;
+}
+
+/* por si el wrapper influye */
+.logout-wrap button {
+  height: 22px !important;
+  min-height: unset !important;
+  padding: 0 12px !important;
+}
+
+/* fallback si streamlit-authenticator lo genera como secondary */
+button[kind="secondary"][data-role="logout"] {
+  height: 22px !important;
+  padding: 0 12px !important;
+  font-size: 11px !important;
 }

@@ -55,3 +55,57 @@
   const mo = new MutationObserver(tagProgresar);
   mo.observe(window.parent.document.body, {childList:true, subtree:true});
 })();
+
+(function () {
+  function tagMenuButtons() {
+    try {
+      const doc = window.parent.document;
+      const btns = Array.from(doc.querySelectorAll("button"));
+
+      function addIfIncludes(keyword, classes) {
+        const b = btns.find(x => ((x.innerText || "").toLowerCase()).includes(keyword));
+        if (!b) return;
+        classes.forEach(c => b.classList.add(c));
+      }
+
+      // OJO: usamos keywords simples (sin emojis ni saltos de linea)
+      addIfIncludes("vouchers", ["btn-menu-icon", "btn-menu-vouchers"]);
+      addIfIncludes("becas", ["btn-menu-icon", "btn-menu-becas"]);
+      addIfIncludes("comedores", ["btn-menu-icon", "btn-menu-comedores"]);
+      addIfIncludes("libros", ["btn-menu-icon", "btn-menu-libros"]);
+
+    } catch (e) { }
+  }
+
+  tagMenuButtons();
+  const mo = new MutationObserver(tagMenuButtons);
+  mo.observe(window.parent.document.body, { childList: true, subtree: true });
+})();
+
+
+(function () {
+  function tagMenuButtons() {
+    try {
+      const doc = window.parent.document;
+      const btns = Array.from(doc.querySelectorAll("button"));
+
+      function addIfIncludes(keyword, classes) {
+        const b = btns.find(x => ((x.innerText || "").toLowerCase()).includes(keyword));
+        if (!b) return;
+        classes.forEach(c => b.classList.add(c));
+      }
+
+      // keywords simples (no dependen de emojis ni \n)
+      addIfIncludes("vouchers", ["btn-menu-icon", "btn-menu-vouchers"]);
+      addIfIncludes("becas", ["btn-menu-icon", "btn-menu-becas"]);
+      addIfIncludes("comedores", ["btn-menu-icon", "btn-menu-comedores"]);
+      addIfIncludes("libros", ["btn-menu-icon", "btn-menu-libros"]);
+    } catch (e) {}
+  }
+
+  // Ejecutar varias veces por si Streamlit re-renderiza
+  tagMenuButtons();
+  const mo = new MutationObserver(tagMenuButtons);
+  mo.observe(window.parent.document.body, { childList: true, subtree: true });
+  setInterval(tagMenuButtons, 1000);
+})();

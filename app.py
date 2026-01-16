@@ -48,6 +48,8 @@ def cargar_js_rel(path_rel: str):
 # CSS SIEMPRE activo (incluso en pantalla de login)
 cargar_css_rel("static/css/styles.css")
 cargar_css_rel("static/css/progresar.css")
+cargar_css_rel("static/css/botones.css")
+
 
 
 # --- CONFIGURACIÓN DE SEGURIDAD Y AUTENTICACIÓN ---
@@ -78,6 +80,35 @@ elif st.session_state["authentication_status"] is None:
     st.warning("Por favor, ingrese sus credenciales para acceder.")
 
 elif st.session_state["authentication_status"]:
+
+  # ==================================================
+  # ICONOS PNG PARA BOTONES DEL MENÚ (NO PROGRESAR)
+  # ==================================================
+    def inject_png_icon_for_button(class_name: str, png_path):
+        try:
+            with open(png_path, "rb") as f:
+                b64 = base64.b64encode(f.read()).decode()
+            data_uri = f"data:image/png;base64,{b64}"
+
+            st.markdown(
+                f"""
+                <style>
+                button.{class_name}::before {{
+                    background-image: url("{data_uri}") !important;
+                }}
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
+        except Exception as e:
+            st.error(f"Error cargando ícono {png_path}: {e}")
+
+    # Iconos de botones (NO Progresar)
+    inject_png_icon_for_button("btn-menu-vouchers", LOGOS_DIR / "vouchers.png")
+    inject_png_icon_for_button("btn-menu-becas", LOGOS_DIR / "becas.png")
+    inject_png_icon_for_button("btn-menu-comedores", LOGOS_DIR / "comida.png")
+    inject_png_icon_for_button("btn-menu-libros", LOGOS_DIR / "libros.png")
+
 
  
     # ------------------------------------------------------------------
@@ -161,20 +192,20 @@ elif st.session_state["authentication_status"]:
             seleccionar_programa("Progresar")
 
     with f1_c2:
-        if st.button("🎫\nVouchers\nEducativos", use_container_width=True):
+        if st.button("Vouchers\nEducativos", use_container_width=True):
             seleccionar_programa("Vouchers")
 
     with f1_c3:
-        if st.button("🤝\nBecas\nFortalecimiento", use_container_width=True):
+        if st.button("Becas\nFortalecimiento", use_container_width=True):
             seleccionar_programa("Becas")
 
     with f1_c4:
-        if st.button("🍎\nComedores\nEscolares", use_container_width=True):
+        if st.button("Comedores\nEscolares", use_container_width=True):
             seleccionar_programa("Comedores")
 
     f2_c1, f2_c2, f2_c3, f2_c4 = st.columns(4)
     with f2_c1:
-        if st.button("📖\nLibros para\naprender", use_container_width=True):
+        if st.button("Libros para\naprender", use_container_width=True):
             seleccionar_programa("Libros")
 
     st.divider()
