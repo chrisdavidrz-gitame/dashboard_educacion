@@ -1,0 +1,84 @@
+/* ============================
+   Botón Progresar: icono + texto en una fila
+   (mantiene colores/fuentes globales)
+   ============================ */
+
+button.btn-progresar-icon {
+  position: relative !important;
+
+  /* altura acorde a tu botón grande */
+  height: 140px !important;
+
+  /* IMPORTANTÍSIMO: que el contenido se alinee a la izquierda */
+  text-align: left !important;
+
+  /* Espacio para el icono + margen cómodo como el diagrama */
+  padding-left: 140px !important;
+  padding-right: 96px !important;
+
+  /* Centrado vertical real */
+  display: flex !important;
+  align-items: center !important;
+
+  /* Si se te partía en líneas, evitamos saltos */
+  white-space: nowrap !important;
+
+  font-size: 120px !important;   /* más grande */
+  font-weight: 600 !important;  /* un poco más fuerte */
+}
+
+/* Icono a la izquierda */
+button.btn-progresar-icon::before {
+  content: "" !important;
+  position: absolute !important;
+
+  /* similar al diagrama: icono grande y centrado */
+  left: 52px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+
+  width: 64px !important;
+  height: 64px !important;
+
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+  display: block !important;
+}
+
+/* Ajuste fino del texto “Progresar” dentro del botón */
+button.btn-progresar-icon > div,
+button.btn-progresar-icon span,
+button.btn-progresar-icon p {
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
+/* ============================
+   TEXTO INTERNO DEL BOTÓN PROGRESAR
+   ============================ */
+
+/* Apuntamos al texto real que dibuja Streamlit */
+button.btn-progresar-icon div[data-testid="stMarkdownContainer"] p {
+  font-size: 30px !important;   /* acá SÍ responde */
+  font-weight: 600 !important;
+  margin: 0 !important;
+  line-height: 1.1 !important;
+}
+
+/* Por si Streamlit cambia el wrapper */
+button.btn-progresar-icon p {
+  font-size: 30px !important;
+  font-weight: 600 !important;
+}
+
+/* Ajuste fino del texto dentro del botón Progresar */
+button.btn-progresar-icon div[data-testid="stMarkdownContainer"] {
+  display: flex !important;
+  align-items: center !important;
+}
+
+button.btn-progresar-icon div[data-testid="stMarkdownContainer"] p {
+  position: relative;
+  top: 2px;   /* bajalo/subilo a gusto */
+}
